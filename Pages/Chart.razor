@@ -5,13 +5,14 @@
 @inject FAF.WebService WebService
 
 @page "/chart"
+@page "/"
 
 @*<PageTitle>Index</PageTitle>*@
  
 @*<SurveyPrompt Title="How is Blazor working for you?" />*@
 
 <div class="container vertical fill">
-    <div class="legend-title">
+    <div class="legend-title" style="text-align: center;">
         Chart - Supreme Commander Units 
     </div>
    @* <button onclick=""></button>*@
@@ -23,33 +24,47 @@
         </IgbLegend>
     </div>*@
 
-       @* Brushes="@Brushes"
-           Outlines="@Brushes"
-           MarkerOutlines="@Brushes"
-           MarkerBrushes="@Brushes"*@
+       @* *@
 
     <div class="container vertical fill">
-        <IgbDataChart IsHorizontalZoomEnabled="true" IsVerticalZoomEnabled="true"
+        <IgbDataChart 
+           @ref="chart"
            Name="chart" Height="600px"
-       
-           @ref="chart">
+           SeriesMouseEnterScript="onSeriesMouseEnter"
+           IsHorizontalZoomEnabled="true" IsVerticalZoomEnabled="true"
+           Brushes="@Brushes" Outlines="@Brushes" MarkerOutlines="@Brushes" MarkerBrushes="@Brushes">
 
-               <IgbNumericXAxis Name="xAxis" @ref="xAxis"
+               <IgbNumericXAxis Name="xAxis" @ref="xAxis" 
+               TitleTextColor="Black" TitleFontSize="12" TitleTopMargin="5"
+                    StrokeThickness="1" Stroke="Gray"
                     IsLogarithmic="true"
                     AbbreviateLargeNumbers="true"   >
                </IgbNumericXAxis>
-
-             @*   <IgbNumericXAxis Name="xAxis2" @ref="xAxis2"  
+                
+               @* *@
+               <IgbNumericYAxis Name="yAxis" @ref="yAxis" 
+                    TitleTextColor="Black" TitleFontSize="12"
+                    TitleRightMargin="0"
+                    TitleLeftMargin="0"
+                    StrokeThickness="1.5" Stroke="Gray"
+                    LabelExtent="50"
+                    IsLogarithmic="true"  
                     AbbreviateLargeNumbers="true">
-               </IgbNumericXAxis>*@
-               @* MinimumValue="0" MaximumValue="10"*@
-               <IgbNumericYAxis Name="yAxis" @ref="yAxis"
-                   IsLogarithmic="true"
-                   AbbreviateLargeNumbers="true">
                </IgbNumericYAxis>
-       
+               
+             @*   <IgbCrosshairLayer 
+                Name="CrosshairLayer"
+                IsAxisAnnotationEnabled="true"   
+                XAxisAnnotationInterpolatedValuePrecision="1"
+                YAxisAnnotationInterpolatedValuePrecision="1" />*@
+           
+           @*    <IgbDataToolTipLayer
+                       Name="DataToolTipLayer"
+                       @ref="dataToolTipLayer">
+               </IgbDataToolTipLayer>
+*@
               @* 
-                   TitleLeftMargin="10"
+                   TitleLeftMargin="10"  Stroke="Black"
                    TitleRightMargin="0"
                    LabelLeftMargin="0"
                
@@ -67,12 +82,7 @@
                DataSource="Units"
                MarkerFillOpacity="0.5"
                ShowDefaultTooltip="true" 
-       
-     
-              @* <IgbDataToolTipLayer
-               Name="DataToolTipLayer"
-               @ref="dataToolTipLayer">
-               </IgbDataToolTipLayer>*@
+            *@
        
            </IgbDataChart>
 
@@ -87,23 +97,18 @@
 
     private IgbLegend legend;
     private IgbDataChart chart;
-    private IgbNumericXAxis xAxis;
-    // private IgbNumericXAxis xAxis2;
-    private IgbNumericYAxis yAxis;
-    private IgbNumericYAxis yAxis2;
-    private IgbBubbleSeries bubbleSeries1;
-    private IgbBubbleSeries bubbleSeries2;
+    private IgbNumericXAxis xAxis; 
+    private IgbNumericYAxis yAxis;  
     private IgbDataToolTipLayer dataToolTipLayer;
 
-    private string Factions = "UEF Cybran Aeon Seraphim Nomads";
-    private string Brushes = "#1174ed, #eb2c1e, #19d113, #d1bb13, #b57807";
+    private string Factions = "UEF, Cybran, Aeon, Seraphim, Nomads, UNKNOWN";
+    private string Brushes = "#1174ed, #eb2c1e, #19d113, #d1bb13, #874b01, #292828";
 
     private Action BindElements { get; set; }
 
-    //private List<BlueprintUnit> UnitsAll; 
-    private List<BlueprintGroup> UnitGroups;
 
-    private List<Blueprint> UnitsAll = new List<Blueprint>(); 
+    private List<Blueprint> UnitBlueprints = new List<Blueprint>(); 
+    private List<BlueprintGroup> UnitGroups = new List<BlueprintGroup>(); 
 
     DateTime RenStart = DateTime.Now;
     protected override async Task OnInitializedAsync()
@@ -111,12 +116,12 @@
         TaskUtils.Start("OnInitializedAsync"); 
         //var Start = DateTime.Now;
 
-        //UnitsAll = await BP.Load();
-        //UnitGroups = BP.GroupBy(UnitsAll, "Filters.Faction");
-        //var unitGroups = BP.GroupBy(UnitsAll, "General.FactionName");
-        //var unitGroups = BP.GroupBy(UnitsAll, "General.Classification");
-        //var unitGroups = BP.GroupBy(UnitsAll, "Type");
-        //var unitGroups = BP.GroupBy(UnitsAll, "Type"); 
+        //UnitBlueprints = await BP.Load();
+        //UnitGroups = BP.GroupBy(UnitBlueprints, "Filters.Faction");
+        //var unitGroups = BP.GroupBy(UnitBlueprints, "General.FactionName");
+        //var unitGroups = BP.GroupBy(UnitBlueprints, "General.Classification");
+        //var unitGroups = BP.GroupBy(UnitBlueprints, "Type");
+        //var unitGroups = BP.GroupBy(UnitBlueprints, "Type"); 
         // SyncChart();
 
         //var Stop = DateTime.Now;
@@ -129,21 +134,29 @@
     }
 
     protected void SyncChart()
-    {
-        if (this.chart == null) return;        
-        if (this.UnitsAll == null) return;   
-        if (this.UnitsAll.Count == 0) return; 
-        // if (this.chart.Series.Count >= this.UnitGroups.Count) return;
+    {    
+
+        if (this.UnitGroups == null) return;   
+        if (this.UnitGroups.Count == 0) return; 
+
+        if (this.chart == null) return;    
+        // if (this.chart.Series.Count > 0) return;
+        if (this.chart.Series.Count >= this.UnitGroups.Count) return;
+
+        //if (this.UnitBlueprints == null) return;   
+        //if (this.UnitBlueprints.Count == 0) return; 
+
 
         //   BP.ChartStart = DateTime.Now;
         //  Console.WriteLine("FAF SyncChart " );
+        Console.WriteLine("FAF SyncChart groups=" + this.UnitGroups.Count);
 
-        //foreach (var group in UnitGroups)
-        //{ 
-        //    AddSeries(group.Units, group.Title);
-        //}
+        foreach (var group in this.UnitGroups)
+        { 
+            AddSeries(group.Units, group.Title);
+        }
 
-        AddSeries(UnitsAll, "UnitsAll");
+        //AddSeries(UnitBlueprints, "UnitBlueprints");
 
         //BP.ChartStop = DateTime.Now;
         // Console.WriteLine("FAF SyncChart " + BP.ChartStop.Subtract(BP.ChartStart).TotalMilliseconds);
@@ -176,25 +189,39 @@
             //var website = Web.Service.Local.Uri;
             Console.WriteLine("website " + website);
 
-            var url = website + "data/bp_extracted.json"; 
-            //var url = "https://localhost:7274/data/bp_extracted.json"; 
+            //var url = website + "data/bp-extracted.json"; 
+            var url = website + "data/bp-extracted-small.json";              
             var units = await BlueprintData.Load(url);
+            var groups = BlueprintData.GroupBy(units, "FactionName");
             var item1 = units[0];
             var item2 = units[20];
             var item3 = units[50];
-            foreach (var unit in units)
-            {
-                var item = new Blueprint();
-                item.Economy = unit.Economy;
-                item.Defense = unit.Defense;
-                item.Id = unit.Id;
 
-                UnitsAll.Add(item);
-                //if (unit.Id.Contains("UNK"))
-                //{
-                //    Console.WriteLine("FAF " + unit.Id + " " + unit.Description);
-                //}
+            foreach (var group in groups)
+            {
+                var unitGroup = new BlueprintGroup();
+                unitGroup.Title = group.Title;
+
+                foreach (var unit in group.Units)
+                {
+                    var item = new Blueprint();
+                    item.Economy = unit.Economy;
+                    item.Defense = unit.Defense;
+                    item.Id = unit.Id;
+                    //   item.General.FactionName = unit.General.FactionName;
+                    item.General.FactionIndex = unit.General.FactionIndex;
+
+                    unitGroup.Units.Add(item);
+                    //this.UnitBlueprints.Add(item);
+                    //if (unit.Id.Contains("UNK"))
+                    //{
+                    //    Console.WriteLine("FAF " + unit.Id + " " + unit.Description);
+                    //}
+                }
+                this.UnitGroups.Add(unitGroup);
             }
+
+            // this.UnitGroups = BlueprintData.GroupBy(UnitBlueprints, "FactionName");
 
             SyncChart();
         }
@@ -212,7 +239,7 @@
 
     public void AddSeries(List<Blueprint> units, string faction) 
     {  
-        //var units = UnitsAll.Where(x => x.General.FactionName == faction).ToList();
+        //var units = UnitBlueprints.Where(x => x.General.FactionName == faction).ToList();
         //Console.WriteLine("FAF BP " + faction + "=" + units.Count);
         // var Start = DateTime.Now;
         TaskUtils.Start("AddSeries");
@@ -234,11 +261,11 @@
         s.XAxisName = "xAxis";
         s.YAxisName = "yAxis";
         // s.XMemberPath = "Economy.BuildTime";
-        s.YMemberPath = "Economy.BuildCostMass";
-        //s.XMemberPath = "BuildTime";
-        //s.YMemberPath = "FactionIndex";
+        //s.XMemberPath = "Economy.BuildTime";
         s.XMemberPath = "Economy.BuildTime";
-        //s.YMemberPath = "General.FactionIndex";
+        //s.YMemberPath = "FactionIndex";
+        //s.YMemberPath = "Economy.BuildCostMass";
+        s.YMemberPath = "General.FactionIndex";
 
         ////s.XMemberPath = "[EconomyBuildCostMass]";
         ////s.YMemberPath = "[GeneralFactionIndex]";
@@ -256,11 +283,19 @@
         //  s.MarkerFillOpacity = 0.5;
         //   s.ShowDefaultTooltip = true;
         s.Title = faction + " (" + units.Count + ")";
-        //s.Name="BubbleSeries1"
+        s.ShowDefaultTooltip = true;
         //s.RadiusScale = scale;
 
-        this.yAxis.Title = s.YMemberPath;
-        this.xAxis.Title = s.XMemberPath;
+        if (!string.IsNullOrEmpty(s.YMemberPath)) this.yAxis.Title = s.YMemberPath.Replace(".", " ");
+        if (!string.IsNullOrEmpty(s.XMemberPath)) this.xAxis.Title = s.XMemberPath.Replace(".", " ");
+
+        if (s.YMemberPath == "General.FactionIndex")
+        {
+            this.yAxis.IsLogarithmic = false;
+            this.yAxis.MinimumValue = 0;
+            this.yAxis.MaximumValue = 6;
+            this.yAxis.Interval = 1;
+        }
 
         this.chart.Series.Add(s);
 

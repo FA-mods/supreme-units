@@ -31,7 +31,7 @@ namespace FAF
                 var start = Tasks[taskName];
                 var stop = DateTime.Now;
                 var time = stop.Subtract(start);
-                Console.WriteLine("FAF " + taskName + " " + time.TotalMilliseconds.ToString("0.0s"));
+                Console.WriteLine("FAF " + taskName + " " + time.TotalSeconds.ToString("0.000s"));
             }
         }
 

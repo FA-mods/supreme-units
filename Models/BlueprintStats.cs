@@ -108,7 +108,7 @@ namespace FAF
                 // group.Units = allUnits.Where(x => x.Groups[propertyName].Equals(value)).ToList();
                 // group.Units = allUnits.Where(x => x.Data[propertyName].Equals(name)).ToList();
               //  group.Units = allUnits.Where(x => x.General.FactionName.Equals(name)).ToList();
-                group.Units = allUnits.Where(x => x.General.Classification.Equals(name)).ToList();
+              //  group.Units = allUnits.Where(x => x.General.Classification.Equals(name)).ToList();
                 //    group.Units = flatUnits.Where(x => x["GeneralFactionName"].Equals(name)).ToList();
 
                 ret.Add(group);

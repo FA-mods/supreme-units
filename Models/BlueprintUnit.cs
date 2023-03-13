@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 namespace FAF
 {
 
-    public class BlueprintGroup
+    public class BlueprintGroup2
     {
         public List<BlueprintUnit> Units { get; set; }
         public string Title { get; set; }

@@ -16,12 +16,16 @@ builder.Services.AddScoped(typeof(FAF.WebService));
 
 // registering Infragistics Blazor
 builder.Services.AddIgniteUIBlazor(
+    typeof(IgbAnnotationLayerProxyModule),
+    typeof(IgbCrosshairLayerModule),
     typeof(IgbLegendModule),
     typeof(IgbNumberAbbreviatorModule),
     typeof(IgbDataChartCoreModule),
     typeof(IgbDataChartScatterModule),
     typeof(IgbDataChartScatterCoreModule),
-    typeof(IgbDataChartInteractivityModule)
+    typeof(IgbDataChartAnnotationModule),
+    typeof(IgbDataChartInteractivityModule),
+    typeof(IgbValueOverlayModule)
 );
 
 await builder.Build().RunAsync();
