@@ -1,0 +1,16 @@
+﻿
+    get TechLevel (1-4), 
+    get WeaponType (air, torp, direct), 
+    get MovementType (air, land, navy, base), 
+    get WeaponCategory death, "Direct Fire"
+    get FactionName
+
+    unit filters: None OR select 1 or more in FactionName, MovementType, TechLevel, WeaponCategory 
+    series group by: None OR select FactionName, MovementType, TechLevel, WeaponCategory
+
+    BubbleChart if x and y are numberic
+    BarChart if x is category (FactionName)
+
+    X-axis plot: eco, health, health/mass, damage/mass, dps/mass
+    Y-axis plot: eco, health, 
+    R-axis plot: eco, health, weapon: RateOfFire, Damage, MaxRadius

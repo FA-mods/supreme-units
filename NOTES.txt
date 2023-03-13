@@ -1,0 +1,52 @@
+host on git
+new https://ilovedotnet.org/blogs/blazor-wasm-publishing-to-github-pages/
+old https://swimburger.net/blog/dotnet/how-to-deploy-aspnet-blazor-webassembly-to-github-pages
+ 
+YOUR_USERNAME.github.io/YOUR_REPOSITORY_NAME
+https://HUSSAR-mtrela.github.io/host-blazor/
+
+YOUR_ORGNAME.github.io/YOUR_REPOSITORY_NAME
+https://fa-mods.github.io/host-blazor/
+
+UNIT DB 
+--------------------------------------------
+v1 
+https://faforever.github.io/spooky-db/#/
+https://faforever.github.io/spooky-db/#/UEL0001,URL0001,UAL0001,XSL0001
+
+v2 
+https://faf-unitdb.web.app/faf/list-by-faction
+https://faf-unitdb.web.app/faf/list-by-class
+
+URL parameters
+--------------------------------------------
+plot?
+	X=build-cost-mass|
+	Y=damage|
+	R=dps|
+
+filters?
+	faction=cybran+aeon+uef+seraphim|
+	category=navy+factory|
+	tech=1+2+3+4|
+
+
+https://fa-mods.github.io/supcom/
+https://fa-mods.github.io/supcom/dasboard
+https://fa-mods.github.io/supcom/chart?x=mass|y=damage 
+https://fa-mods.github.io/supcom/compare?id=ura0001
+
+https://fa-mods.github.io/supreme/
+https://fa-mods.github.io/supreme/dasboard
+https://fa-mods.github.io/supreme/chart?x=mass|y=damage 
+https://fa-mods.github.io/supreme/compare?id=ura0001
+
+https://fa-mods.github.io/supreme-chart/
+https://fa-mods.github.io/supreme-chart/dasboard
+https://fa-mods.github.io/supreme-chart/plot?X=build-cost-mass|Y=damage|R=build-power|factions=C+A+U+S|class=factory|
+https://fa-mods.github.io/supreme-chart/compare?id=ura0001
+
+RENAME 
+https://github.com/FA-mods
+https://github.com/faf-apps
+https://github.com/mtrela-apps

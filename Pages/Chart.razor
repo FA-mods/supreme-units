@@ -1,0 +1,272 @@
+﻿@using IgniteUI.Blazor.Controls
+@using FAF
+@inject IIgniteUIBlazor IgniteUIBlazor
+@inject FAF.BlueprintStats BP
+@inject FAF.WebService WebService
+
+@page "/chart"
+
+@*<PageTitle>Index</PageTitle>*@
+ 
+@*<SurveyPrompt Title="How is Blazor working for you?" />*@
+
+<div class="container vertical fill">
+    <div class="legend-title">
+        Chart - Supreme Commander Units 
+    </div>
+   @* <button onclick=""></button>*@
+  @*  <div class="legend">
+        <IgbLegend
+        Orientation="LegendOrientation.Horizontal"
+        Name="Legend"
+        @ref="legend">
+        </IgbLegend>
+    </div>*@
+
+       @* Brushes="@Brushes"
+           Outlines="@Brushes"
+           MarkerOutlines="@Brushes"
+           MarkerBrushes="@Brushes"*@
+
+    <div class="container vertical fill">
+        <IgbDataChart IsHorizontalZoomEnabled="true" IsVerticalZoomEnabled="true"
+           Name="chart" Height="600px"
+       
+           @ref="chart">
+
+               <IgbNumericXAxis Name="xAxis" @ref="xAxis"
+                    IsLogarithmic="true"
+                    AbbreviateLargeNumbers="true"   >
+               </IgbNumericXAxis>
+
+             @*   <IgbNumericXAxis Name="xAxis2" @ref="xAxis2"  
+                    AbbreviateLargeNumbers="true">
+               </IgbNumericXAxis>*@
+               @* MinimumValue="0" MaximumValue="10"*@
+               <IgbNumericYAxis Name="yAxis" @ref="yAxis"
+                   IsLogarithmic="true"
+                   AbbreviateLargeNumbers="true">
+               </IgbNumericYAxis>
+       
+              @* 
+                   TitleLeftMargin="10"
+                   TitleRightMargin="0"
+                   LabelLeftMargin="0"
+               
+               <IgbBubbleSeries
+               XAxisName="xAxis"
+               YAxisName="yAxis"
+               XMemberPath="Economy.BuildTime"
+               YMemberPath="Economy.BuildCostMass"
+               RadiusMemberPath="Economy.BuildCostMass"
+
+               MarkerType="MarkerType.Circle"
+               MarkerThickness="2"
+               MarkerBrush="#3eca3e"
+               MarkerOutline="#3eca3e"
+               DataSource="Units"
+               MarkerFillOpacity="0.5"
+               ShowDefaultTooltip="true" 
+       
+     
+              @* <IgbDataToolTipLayer
+               Name="DataToolTipLayer"
+               @ref="dataToolTipLayer">
+               </IgbDataToolTipLayer>*@
+       
+           </IgbDataChart>
+
+    </div>
+     
+    @*<div class="legend-title">
+        FAF Bottom
+    </div>*@
+</div>
+
+@code {
+
+    private IgbLegend legend;
+    private IgbDataChart chart;
+    private IgbNumericXAxis xAxis;
+    // private IgbNumericXAxis xAxis2;
+    private IgbNumericYAxis yAxis;
+    private IgbNumericYAxis yAxis2;
+    private IgbBubbleSeries bubbleSeries1;
+    private IgbBubbleSeries bubbleSeries2;
+    private IgbDataToolTipLayer dataToolTipLayer;
+
+    private string Factions = "UEF Cybran Aeon Seraphim Nomads";
+    private string Brushes = "#1174ed, #eb2c1e, #19d113, #d1bb13, #b57807";
+
+    private Action BindElements { get; set; }
+
+    //private List<BlueprintUnit> UnitsAll; 
+    private List<BlueprintGroup> UnitGroups;
+
+    private List<Blueprint> UnitsAll = new List<Blueprint>(); 
+
+    DateTime RenStart = DateTime.Now;
+    protected override async Task OnInitializedAsync()
+    {
+        TaskUtils.Start("OnInitializedAsync"); 
+        //var Start = DateTime.Now;
+
+        //UnitsAll = await BP.Load();
+        //UnitGroups = BP.GroupBy(UnitsAll, "Filters.Faction");
+        //var unitGroups = BP.GroupBy(UnitsAll, "General.FactionName");
+        //var unitGroups = BP.GroupBy(UnitsAll, "General.Classification");
+        //var unitGroups = BP.GroupBy(UnitsAll, "Type");
+        //var unitGroups = BP.GroupBy(UnitsAll, "Type"); 
+        // SyncChart();
+
+        //var Stop = DateTime.Now;
+        //Console.WriteLine("FAF OnInitializedAsync " + Stop.Subtract(Start).TotalMilliseconds);
+
+
+        TaskUtils.Stop("OnInitializedAsync");
+        await Task.Delay(1);
+
+    }
+
+    protected void SyncChart()
+    {
+        if (this.chart == null) return;        
+        if (this.UnitsAll == null) return;   
+        if (this.UnitsAll.Count == 0) return; 
+        // if (this.chart.Series.Count >= this.UnitGroups.Count) return;
+
+        //   BP.ChartStart = DateTime.Now;
+        //  Console.WriteLine("FAF SyncChart " );
+
+        //foreach (var group in UnitGroups)
+        //{ 
+        //    AddSeries(group.Units, group.Title);
+        //}
+
+        AddSeries(UnitsAll, "UnitsAll");
+
+        //BP.ChartStop = DateTime.Now;
+        // Console.WriteLine("FAF SyncChart " + BP.ChartStop.Subtract(BP.ChartStart).TotalMilliseconds);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        TaskUtils.Start("OnAfterRenderAsync");
+        Web.Service = WebService;
+
+        // Console.WriteLine("FAF OnAfterRenderAsync");
+
+        var Start = DateTime.Now;
+        var legend = this.legend;
+        var chart = this.chart;
+        var xAxis = this.xAxis;
+        var yAxis = this.yAxis;
+
+        //  var dataToolTipLayer = this.dataToolTipLayer;
+
+        //this.BindElements = () => {
+        //    chart.Legend = this.legend;
+        //};
+        //this.BindElements();
+
+        if (firstRender)
+        {
+            var website = Web.Service.Local.BaseUri;
+            //var website = Web.Service.Local.Uri;
+            Console.WriteLine("website " + website);
+
+            var url = website + "data/bp_extracted.json"; 
+            //var url = "https://localhost:7274/data/bp_extracted.json"; 
+            var units = await BlueprintData.Load(url);
+            var item1 = units[0];
+            var item2 = units[20];
+            var item3 = units[50];
+            foreach (var unit in units)
+            {
+                var item = new Blueprint();
+                item.Economy = unit.Economy;
+                item.Defense = unit.Defense;
+                item.Id = unit.Id;
+
+                UnitsAll.Add(item);
+                //if (unit.Id.Contains("UNK"))
+                //{
+                //    Console.WriteLine("FAF " + unit.Id + " " + unit.Description);
+                //}
+            }
+
+            SyncChart();
+        }
+
+
+        SyncChart();
+
+        //var Stop = DateTime.Now;
+        //Console.WriteLine("FAF OnAfterRenderAsync " + Stop.Subtract(RenStart).TotalMilliseconds);
+
+        TaskUtils.Stop("OnAfterRenderAsync");
+        await Task.Delay(1);
+    }
+
+
+    public void AddSeries(List<Blueprint> units, string faction) 
+    {  
+        //var units = UnitsAll.Where(x => x.General.FactionName == faction).ToList();
+        //Console.WriteLine("FAF BP " + faction + "=" + units.Count);
+        // var Start = DateTime.Now;
+        TaskUtils.Start("AddSeries");
+
+        // var first = units[0];
+        // first.Economy.BuildTime
+
+        var scale = new IgbSizeScale();
+        scale.MinimumValue = 10;
+        scale.MaximumValue = 50;
+
+        //var s = new IgbBubbleSeries();
+        var s = new IgbScatterSeries();
+        s.Name = "Series" + this.chart.Series.Count;
+
+        //s.XMemberAsLegendLabel = "Build Time";
+        //s.YMemberAsLegendLabel = "Build Cost";
+        //s.RadiusMemberAsLegendLabel = "BuildRate";
+        s.XAxisName = "xAxis";
+        s.YAxisName = "yAxis";
+        // s.XMemberPath = "Economy.BuildTime";
+        s.YMemberPath = "Economy.BuildCostMass";
+        //s.XMemberPath = "BuildTime";
+        //s.YMemberPath = "FactionIndex";
+        s.XMemberPath = "Economy.BuildTime";
+        //s.YMemberPath = "General.FactionIndex";
+
+        ////s.XMemberPath = "[EconomyBuildCostMass]";
+        ////s.YMemberPath = "[GeneralFactionIndex]";
+        //s.XMemberPath = "EconomyBuildCostMass";
+        //s.YMemberPath = "GeneralFactionIndex";
+
+        //s.RadiusMemberPath = "Economy.BuildRate";
+
+        // s.MarkerType="MarkerType.Circle"
+        // s.MarkerThickness="2"
+        //s.MarkerBrush = color;
+        //s.MarkerOutline = color;
+        s.MaximumMarkers = 1000;
+        s.DataSource = units;
+        //  s.MarkerFillOpacity = 0.5;
+        //   s.ShowDefaultTooltip = true;
+        s.Title = faction + " (" + units.Count + ")";
+        //s.Name="BubbleSeries1"
+        //s.RadiusScale = scale;
+
+        this.yAxis.Title = s.YMemberPath;
+        this.xAxis.Title = s.XMemberPath;
+
+        this.chart.Series.Add(s);
+
+        //   var Stop = DateTime.Now;
+         //   Console.WriteLine("FAF AddSeries " + Stop.Subtract(Start).TotalMilliseconds);
+        TaskUtils.Stop("AddSeries");
+        
+    }
+}
