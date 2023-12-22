@@ -13,19 +13,23 @@
     <base href="/supreme-units/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
+    <link href="css/shared.css" rel="stylesheet" />
     <link href="SupremeUnitsApp.styles.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
 
-    <link href="https://static.infragistics.com/xplatform/css/samples/shared.v6.css" rel="stylesheet" />
+    <!--<link href="https://static.infragistics.com/xplatform/css/samples/shared.v6.css" rel="stylesheet" />-->
     <!--<link href="https://static.infragistics.com/xplatform/images/browsers/blazor.ico" rel="icon" type="image/x-icon">-->
     <link href="https://static.infragistics.com/xplatform/css/samples/blazor.css" rel="stylesheet" />
 
+    <link href="_content/IgniteUI.Blazor/themes/light/bootstrap.css" rel="stylesheet" />
+
 </head>
 <!--style="background: #8b8c8d;"-->
-<body>
-    <div id="app">Loading...</div>
+<body style="background: #202124;">
+
+    <div id="app" class="container fill">Loading...</div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -33,12 +37,16 @@
         <a class="dismiss">🗙</a>
     </div>
 
+
     <!-- importing blazor bundle for IG controls: -->
     <script src="_content/IgniteUI.Blazor/app.bundle.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 
-    <script src="./chart-tooltips.js"></script>
+    <script src="./scripts/utils.js"></script>
+    <script src="./scripts/chart-markers.js"></script>
+    <script src="./scripts/chart-tooltips.js"></script>
+    <script src="./scripts/units-provider.js"></script>
 </body>
 
 </html>
