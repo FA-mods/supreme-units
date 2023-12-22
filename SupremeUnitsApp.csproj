@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;BL0005;CS8618;8618;8601;8602;8603;8712;8714</NoWarn>
+    <NoWarn>1701;1702;BL0005;CS8618;CS1998;8618;8601;8602;8603;8712;8714</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;BL0005;CS8618;8618;8601;8602;8603;8712;8714</NoWarn>
+    <NoWarn>1701;1702;BL0005;CS8618;CS1998;8618;8601;8602;8603;8712;8714</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IgniteUI.Blazor.Trial" Version="22.2.52" />
+    <PackageReference Include="IgniteUI.Blazor.Trial" Version="22.2.65" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
@@ -29,5 +29,22 @@
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
-
+    
+  <ItemGroup>
+      <!-- Files that the "dotnet watch run" will monitor for hot reloading: -->
+      <Watch Include="**\*.razor" />
+      <Watch Include="**\*.scss" />
+      <Watch Include="**\*.cshtml" />
+      <Watch Include="**\*.cs" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Content Remove="Shared\SurveyPrompt.razor" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Watch Remove="Pages\Scripter.Evemts.razor.cs" />
+    <Watch Remove="Pages\Scripter.razor.cs" />
+    <Watch Remove="Shared\NavLayout.razor" />
+  </ItemGroup>
 </Project>

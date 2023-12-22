@@ -1,0 +1,408 @@
+﻿
+@using FAF
+@using System.Text.Json
+@inject IIgniteUIBlazor IgniteUIBlazor
+@inject IJSRuntime JSR
+
+@page "/"
+@page "/scripter"
+
+<PageTitle>Chart</PageTitle>
+
+<div class="container horizontal fill" style="background: #FFFFFF;">
+    @*<h1>Hello, Test Scripter5!</h1>*@
+    <div class="container fill" 
+        style="background: #FFFFFF; padding-left: 0.25rem; 
+padding-right: 0.25rem; ">
+        @*z-index: 1000*@
+        
+           @*SeriesMouseEnterScript="onSeriesMouseEnter"*@
+        <IgbDataChart 
+           @ref="chart"
+           Name="chart" Height="700px" Width="100%"
+           SeriesMouseEnterScript="onSeriesMouseEnter"
+           DefaultInteraction="InteractionState.DragPan"
+           IsHorizontalZoomEnabled="true" IsVerticalZoomEnabled="true"
+           Brushes="@Brushes" 
+           Outlines="@Brushes" 
+           MarkerOutlines="@Brushes" 
+           MarkerBrushes="@Brushes">
+
+               <IgbNumericXAxis Name="xAxis" @ref="xAxis" 
+                    TitleTextColor="Black" 
+                    TitleFontSize="12" TitleTopMargin="5"
+                    TickLength="1" TickStrokeThickness="1"
+                    TickStroke="LightGray"
+                    LabelTopMargin="0"
+                    StrokeThickness="1" Stroke="Gray"
+                    MajorStroke="LightGray" 
+                    AbbreviateLargeNumbers="true"   >
+               </IgbNumericXAxis>
+           
+               <IgbNumericYAxis Name="yAxis" @ref="yAxis" 
+                    TitleTextColor="#5F5E5E" 
+                    TitleFontSize="12"
+                    TitleRightMargin="0"
+                    TitleLeftMargin="0"
+                    TickLength="0" TickStrokeThickness="1"
+                    TickStroke="Gray"
+                    MajorStroke="LightGray"
+                    StrokeThickness="1.5" Stroke="Gray"
+                     
+                    AbbreviateLargeNumbers="true">
+               </IgbNumericYAxis>
+                
+                @*<IgbScatterSeries  @ref="trendSeries" Title="TrendSeries"
+                    XAxisName="xAxis"
+                    YAxisName="yAxis"
+                    XMemberPath="Economy.BuildTime"
+                    YMemberPath="Economy.BuildCostTotal"
+                    MarkerType="MarkerType.None"
+                    ShowDefaultTooltip="false"
+                    TrendLineType="TrendLineType.None"
+                    TrendLineBrush="rgba(0, 0, 0, 0.3)"
+                    TrendLineThickness="50"
+                    TrendLineZIndex="0" />                 
+                *@
+                @*TrendLineType="TrendLineType.CubicFit"*@
+
+                <IgbScatterSeries @ref="dataSeries" Title="ScatterSeries"
+                    MarkerTemplateScript="onSeriesMarkerTemplate"
+                    XAxisName="xAxis"
+                    YAxisName="yAxis"
+                    XMemberPath=@DataMemberX
+                    YMemberPath=@DataMemberY
+                    MaximumMarkers="2000"
+                    ShowDefaultTooltip="true"
+                    
+                    TrendLineType=@DataTrendLine
+                    TrendLinePeriod="1"
+                    TrendLineBrush="rgba(0, 0, 0, 0.0)" 
+                    TrendLineThickness="100"
+                    TrendLineZIndex="0"  
+                    />
+                
+                <IgbCrosshairLayer   Title="CrosshairLayer"
+                    IsAxisAnnotationEnabled="true"
+                    XAxisAnnotationBackground="#C0C0BD"
+                    YAxisAnnotationBackground="#C0C0BD"
+                    XAxisAnnotationTextColor="black"
+                    YAxisAnnotationTextColor="black"
+                    XAxisAnnotationPaddingTop="0"
+                    YAxisAnnotationPaddingTop="0"
+                    XAxisAnnotationPaddingBottom="0"
+                    YAxisAnnotationPaddingBottom="0"
+
+                    XAxisAnnotationPaddingLeft="4"
+                    XAxisAnnotationPaddingRight="4"
+
+                    YAxisAnnotationPaddingLeft="3"
+                    YAxisAnnotationPaddingRight="3"
+                    Brush="#909090"
+                    />
+           @*     <IgbDataToolTipLayer Name="DataToolTipLayer"  Title="DataToolTipLayer"/>
+               *@ 
+       
+           </IgbDataChart>
+    </div>
+  
+    <div class="container vertical fill" style="width: 15rem; ">
+        
+
+        <div class="sud-list-viewer" style="  display: flex;
+        flex-direction: column; ">
+            <label>Settings</label>
+            <IgbSelect>
+                <IgbSelectItem Value="orange">Orange</IgbSelectItem>
+                <IgbSelectItem Value="apple">Apple</IgbSelectItem>
+                <IgbSelectItem Value="banana">Banana</IgbSelectItem>
+                <IgbSelectItem Value="mango">Mango</IgbSelectItem>
+            </IgbSelect>
+            
+        </div>
+
+        <div class="sud-list-viewer" style="  display: flex;
+        flex-direction: column;">
+            @if (UnitTitles == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <div>X-Axis </div>
+                <select name="cars" id="selectDataMemberX" @onchange="onDataMemberX">
+                    @foreach (var item in DataMemberPathsX)
+                    {   
+                        <option style="font-size: 1rem" value=@item >@item</option>                  
+                    }  
+                </select>
+                <div>Y-Axis </div>
+                <select name="cars" id="selectDataMemberY" @onchange="onDataMemberY">
+                    @foreach (var item in DataMemberPathsY)
+                    {   
+                        <option style="font-size: 1rem" value=@item >@item</option>                  
+                    }  
+                </select>
+                <div>Trendline Type</div>
+                <select name="cars" id="selectTrendLine" @onchange="onDataTrendLine">
+                    @foreach (var item in DataTrendLineList)
+                    {   
+                        <option style="font-size: 1rem" value=@item >@item</option>                  
+                    }  
+                </select>
+                <div>Marker Type </div>
+                <select name="cars" id="selectTrendLine" @onchange="onDataMarkerType">
+                    @foreach (var item in DataMarkerTypeList)
+                    {   
+                        <option style="font-size: 1rem" value=@item >@item</option>                  
+                    }  
+                </select>
+
+                @*<IgbCombo
+                    Label="Cities"
+                    Placeholder=""
+                    Data="@UnitTitles"
+                    SingleSelect>
+                </IgbCombo>*@
+                   @* ValueKey=""
+                    DisplayKey=""*@  
+
+              @*  @foreach (var item in UnitTitles)
+                {   
+                    <label style="font-size: 0.65rem">@item</label>                  
+                }    *@        
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+
+
+    private IgbLegend legend;
+    private IgbDataChart chart;
+    private IgbNumericXAxis xAxis; 
+    private IgbNumericYAxis yAxis;  
+    private IgbScatterSeries trendSeries;  
+    private IgbScatterSeries dataSeries;  
+    private IgbDataToolTipLayer dataToolTipLayer;
+    private List<Blueprint> DataUnits;
+
+    private int DataCount = 100;
+    private string Factions = "UEF, Cybran, Aeon, Seraphim, Nomads, UNKNOWN";
+    private string Brushes = "#1174ed, #eb2c1e, #19d113, #d1bb13, #874b01, #292828";
+
+
+
+    // private List<string>? UnitTitles = null; // = new List<string>();
+    //private string UnitTitles = "";
+    private List<string> _UnitTitles;
+    public List<string> UnitTitles
+    {
+        get { return _UnitTitles; }
+        set { _UnitTitles = value; StateHasChanged(); }
+    } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        // await BindDataAsync();
+    }
+
+
+    private bool isRefreshCompleted = false;
+    private void OnRefreshCompleted(IgbRefreshCompletedEventArgs args)
+    {
+        //Console.WriteLine("APP OnRefreshCompleted=" + isRefreshCompleted);
+        if (!isRefreshCompleted)
+        {
+            isRefreshCompleted = true;
+            BindData();
+            //Task.Delay(1).ContinueWith((t) => BindDataAsync());
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    { 
+        DataTrendLineLookup = new Dictionary<string, TrendLineType>();
+        foreach(var item in DataTrendLineList)
+        {
+            DataTrendLineLookup.Add(item.ToString(), item);
+        }
+
+        if (firstRender)
+        {
+            await GenerateData();
+        }       
+        SyncChart();
+        //Task.Delay(1).ContinueWith((t) => BindDataAsync());
+        // await BindDataAsync();
+    }
+
+    private async Task GenerateData()
+    {  
+
+        TaskUtils.Start("Blueprint.Load ");
+        //await JSR.InvokeVoidAsync("generateData", this.DataCount);
+        var json = await JSR.InvokeAsync<string>("load");
+        // TaskUtils.Stop("Blueprint.Load ");
+
+        //var unit = await JSR.InvokeAsync<string>("getUnit");
+        TaskUtils.Start("Blueprint.Deserialize ");
+        DataUnits = JsonSerializer.Deserialize<List<Blueprint>>(json);
+        // TaskUtils.Stop("Blueprint.Deserialize ");
+
+        //Console.WriteLine("APP json=" + DataUnits?.Count());
+        //Console.WriteLine("APP unit2=" + unit);
+
+        var jsonTitles = await JSR.InvokeAsync<string>("getUnitTitles");
+        var listTitles = JsonSerializer.Deserialize<List<string>>(jsonTitles);
+        this.UnitTitles = listTitles; //string.Join("\n", listTitles);
+
+        Console.WriteLine("APP titles=" + listTitles.Count);
+    }
+
+    protected void SyncChart()
+    {     
+        //Console.WriteLine("FAF SyncChart ...");
+
+        if (this.DataUnits == null) return;   
+        if (this.DataUnits.Count == 0) return; 
+
+        if (this.chart == null) return;    
+        if (this.chart.Series.Count > 0) return;
+        // if (this.chart.Series.Count >= this.DataUnits.Count) return;
+
+        //if (this.UnitBlueprints == null) return;   
+        //if (this.UnitBlueprints.Count == 0) return; 
+
+        //   BP.ChartStart = DateTime.Now;
+        //  Console.WriteLine("FAF SyncChart " );
+        //Console.WriteLine("FAF SyncChart " + this.DataUnits.Count);
+
+        //foreach (var group in this.DataUnits)
+        //{ 
+        //    AddSeries(group.Units, group.Title);
+        //}
+
+        AddSeries(DataUnits, "DataUnits");
+
+        //BP.ChartStop = DateTime.Now;
+        // Console.WriteLine("FAF SyncChart " + BP.ChartStop.Subtract(BP.ChartStart).TotalMilliseconds);
+
+        //await JSR.InvokeVoidAsync<string>("load");
+
+        // JSR.InvokeVoidAsync("bindData", this.DataUnits.Count);
+
+
+        this.chart.RefreshCompleted += OnRefreshCompleted;
+    }
+
+    private void BindData()
+    {
+       Task.Delay(1).ContinueWith((t) => BindDataAsync());
+    }
+
+    private async Task BindDataAsync()
+    {  
+        //    Console.WriteLine("FAF BindDataAsync ...");
+        //   await IgniteUIBlazor.JsRuntime.InvokeVoidAsync("bindData");
+        //await JSR.InvokeVoidAsync("plotUnits");
+        await IgniteUIBlazor.JsRuntime.InvokeVoidAsync("plotUnits", this.DataMemberX, this.DataMemberY);
+        //  Console.WriteLine("FAF BindData ... end");
+    }
+        
+    private async Task UpdateMarkerTypeAsync()
+    {  
+        await IgniteUIBlazor.JsRuntime.InvokeVoidAsync("updateMarkerType", this.DataMarkerType);
+    }
+
+    public void AddSeries(List<Blueprint> units, string faction) 
+    {  
+        //var units = UnitBlueprints.Where(x => x.General.FactionName == faction).ToList();
+        //Console.WriteLine("FAF BP " + faction + "=" + units.Count);
+        // var Start = DateTime.Now;
+        TaskUtils.Start("AddSeries");
+
+        // var first = units[0];
+        // first.Economy.BuildTime
+
+        //var scale = new IgbSizeScale();
+        //scale.MinimumValue = 10;
+        //scale.MaximumValue = 50;
+
+        //this.trendSeries.XMemberPath = this.dataSeries.XMemberPath;
+        //this.trendSeries.YMemberPath = this.dataSeries.YMemberPath;
+
+        //var s = new IgbBubbleSeries();
+        var s = this.dataSeries;
+        //var s = new IgbScatterSeries();
+        //s.Name = "Series" + this.chart.Series.Count;
+
+        ////s.XMemberAsLegendLabel = "Build Time";
+        ////s.YMemberAsLegendLabel = "Build Cost";
+        ////s.RadiusMemberAsLegendLabel = "BuildRate";
+        //s.XAxisName = "xAxis";
+        //s.YAxisName = "yAxis";
+        //// s.XMemberPath = "Economy.BuildTime";
+        ////s.XMemberPath = "Economy.BuildTime";
+        //s.XMemberPath = "Economy.BuildTime";
+        ////s.YMemberPath = "FactionIndex";
+        //s.YMemberPath = "Economy.BuildCostMass";
+        ////s.YMemberPath = "General.FactionIndex";
+        //s.MarkerTemplateScript = "onSeriesMarkerTemplate";
+        //s.MaximumMarkers = 1000;
+        //s.ShowDefaultTooltip = true;
+
+        ////s.XMemberPath = "[EconomyBuildCostMass]";
+        ////s.YMemberPath = "[GeneralFactionIndex]";
+        //s.XMemberPath = "EconomyBuildCostMass";
+        //s.YMemberPath = "GeneralFactionIndex";
+
+        //s.RadiusMemberPath = "Economy.BuildRate";
+
+        // s.MarkerType="MarkerType.Circle"
+        // s.MarkerThickness="2"
+        //s.MarkerBrush = color;
+        //s.MarkerOutline = color;
+        //  s.MarkerFillOpacity = 0.5;
+        //   s.ShowDefaultTooltip = true;
+        // s.Title = faction + " (" + units.Count + ")";
+        //s.RadiusScale = scale;
+
+        if (!string.IsNullOrEmpty(s.YMemberPath)) this.yAxis.Title = s.YMemberPath; //.Replace(".", " ");
+        if (!string.IsNullOrEmpty(s.XMemberPath)) this.xAxis.Title = s.XMemberPath; //.Replace(".", " ") + "2";
+
+        if (s.YMemberPath == "General.FactionIndex")
+        {
+            //this.yAxis.IsLogarithmic = false;
+            //this.yAxis.MinimumValue = 0;
+            //this.yAxis.MaximumValue = 6;
+            //this.yAxis.Interval = 1;  
+        }
+        else
+        {
+            //this.yAxis.IsLogarithmic = false;
+            //this.yAxis.MinimumValue = double.NaN;
+            //this.yAxis.MaximumValue = double.NaN;
+            //this.yAxis.Interval = double.NaN;  
+        }
+
+        if (s.YMemberPath.Contains("Faction") ||
+            s.YMemberPath.Contains("Level"))
+        {
+            //this.yAxis.IsLogarithmic = false;
+
+            if (s.YMemberPath == "FactionLevel")
+            {
+                //this.yAxis.IsLogarithmic = false;
+                //this.yAxis.MinimumValue = 0;
+                //this.yAxis.MaximumValue = 52;
+                //this.yAxis.Interval = 2; 
+            }
+        }
+         
+      
+    }
+}

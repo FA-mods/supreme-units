@@ -16,6 +16,9 @@ builder.Services.AddScoped(typeof(FAF.WebService));
 
 // registering Infragistics Blazor
 builder.Services.AddIgniteUIBlazor(
+    typeof(IgbSelectModule),
+    typeof(IgbComboModule),
+    typeof(IgbSwitchModule),
     typeof(IgbAnnotationLayerProxyModule),
     typeof(IgbCrosshairLayerModule),
     typeof(IgbLegendModule),

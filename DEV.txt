@@ -1,0 +1,29 @@
+
+open CMD or press CTRL+D
+dotnet watch run
+
+TODO use await
+https://github.com/IgniteUI/igniteui-react-examples/blob/vnext/samples/charts/financial-chart/multiple-data/src/StocksHistory.ts
+
+https://stackoverflow.com/questions/12460378/how-to-get-json-from-url-in-javascript
+//async function fetchDataAsync(url) {
+//    const response = await fetch(url);
+//    console.log(await response.json());
+//}
+//fetchDataAsync('paste URL');
+
+//fetchData(callback) {
+// let url = window.location.protocol + '//' + window.location.host + '/data/bp-extracted-small.json';
+//    fetch(url)
+//        .then(response => response.json())
+//        .then(json => callback(null, json))
+//        .catch(error => callback(error, null))
+//}
+//Then use it like this:
+
+//fetchData((error, data) => {
+//    if (error)
+//        console.log(error)
+//    else
+//        console.log(data[0])
+//});
